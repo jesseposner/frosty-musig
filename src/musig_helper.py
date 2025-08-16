@@ -35,8 +35,30 @@ try:
     get_xonly_pk = musig2_reference.get_xonly_pk
     nonce_gen = musig2_reference.nonce_gen
     nonce_agg = musig2_reference.nonce_agg
+    SessionContext = musig2_reference.SessionContext
+    get_session_values = musig2_reference.get_session_values
+    has_even_y = musig2_reference.has_even_y
+    get_session_key_agg_coeff = musig2_reference.get_session_key_agg_coeff
+    cpoint = musig2_reference.cpoint
+    sign = musig2_reference.sign
+    partial_sig_agg = musig2_reference.partial_sig_agg
+    schnorr_verify = musig2_reference.schnorr_verify
 
 except ImportError as e:
     raise ImportError(f"Failed to import MuSig2 components: {e}") from e
 
-__all__ = ["key_agg", "cbytes", "get_xonly_pk", "nonce_gen", "nonce_agg"]
+__all__ = [
+    "key_agg",
+    "cbytes",
+    "get_xonly_pk",
+    "nonce_gen",
+    "nonce_agg",
+    "SessionContext",
+    "get_session_values",
+    "has_even_y",
+    "get_session_key_agg_coeff",
+    "cpoint",
+    "sign",
+    "partial_sig_agg",
+    "schnorr_verify",
+]

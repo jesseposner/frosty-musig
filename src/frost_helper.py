@@ -44,9 +44,15 @@ try:
     SessionContext = frost_reference.SessionContext
     get_session_values = frost_reference.get_session_values
     cpoint = frost_reference.cpoint
+    int_from_bytes = frost_reference.int_from_bytes
+    cbytes = frost_reference.cbytes
+    session_has_signer_pubshare = frost_reference.session_has_signer_pubshare
+    get_session_interpolating_value = frost_reference.get_session_interpolating_value
+    InvalidContributionError = frost_reference.InvalidContributionError
+    xbytes = frost_reference.xbytes
 
     # Import secp256k1lab utilities
-    from secp256k1lab.secp256k1 import G, Scalar  # noqa: E402
+    from secp256k1lab.secp256k1 import GE, G, Scalar  # noqa: E402
 
 except ImportError as e:
     raise ImportError(f"Failed to import FROST components: {e}") from e
@@ -55,9 +61,16 @@ __all__ = [
     "generate_frost_keys",
     "Scalar",
     "G",
+    "GE",
     "nonce_gen",
     "nonce_agg",
     "SessionContext",
     "get_session_values",
     "cpoint",
+    "int_from_bytes",
+    "cbytes",
+    "session_has_signer_pubshare",
+    "get_session_interpolating_value",
+    "InvalidContributionError",
+    "xbytes",
 ]
