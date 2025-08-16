@@ -1,0 +1,6 @@
+[submodule "frost"]
+	path = frost
+	url = https://github.com/siv2r/bip-frost-signing.git
+[submodule "bips"]
+	path = bips
+	url = https://github.com/bitcoin/bips.git
