@@ -131,9 +131,9 @@ def test_nested_signing_protocol():
 
     # Step 12: Aggregate FROST partial signatures
     frost_psig = nested_frost_partial_sig_agg(
-        [psig_frost_1, psig_frost_2], [0, 2], frost_session_ctx
+        [psig_frost_1, psig_frost_2], [0, 2], frost_session_ctx, musig_session_ctx
     )
-    assert len(frost_psig) == 64  # 32 bytes R + 32 bytes s
+    assert len(frost_psig) == 32  # 32 bytes s
     print("✓ FROST signature aggregation successful")
 
     # Step 13: Other MuSig2 participant creates signature
@@ -142,7 +142,7 @@ def test_nested_signing_protocol():
 
     # Step 14: Final MuSig2 signature aggregation
     # Note: frost_psig[32:] extracts just the s value (skipping R)
-    sig = musig_partial_sig_agg([frost_psig[32:], other_psig], musig_session_ctx)
+    sig = musig_partial_sig_agg([frost_psig, other_psig], musig_session_ctx)
     assert len(sig) == 64  # Complete Schnorr signature
     print("✓ Final MuSig2 signature aggregation successful")
 
@@ -256,11 +256,11 @@ def test_deterministic_signing():
     )
 
     frost_psig = nested_frost_partial_sig_agg(
-        [psig_frost_1, psig_frost_2], [0, 2], frost_session_ctx
+        [psig_frost_1, psig_frost_2], [0, 2], frost_session_ctx, musig_session_ctx
     )
 
     other_psig = musig_sign(other_secnonce, other_secret.to_bytes(), musig_session_ctx)
-    sig = musig_partial_sig_agg([frost_psig[32:], other_psig], musig_session_ctx)
+    sig = musig_partial_sig_agg([frost_psig, other_psig], musig_session_ctx)
 
     # Verify
     is_valid = musig_schnorr_verify(message, agg_xonly, sig)

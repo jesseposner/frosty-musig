@@ -24,7 +24,6 @@ from frost_helper import get_session_values as frost_get_session_values
 from frost_helper import int_from_bytes as frost_int_from_bytes
 from frost_helper import nonce_agg as frost_nonce_agg
 from frost_helper import nonce_gen as frost_nonce_gen
-from frost_helper import xbytes as frost_xbytes
 from musig_helper import SessionContext as MusigSessionContext
 from musig_helper import cbytes as musig_cbytes
 from musig_helper import cpoint as musig_cpoint
@@ -92,7 +91,7 @@ def nested_frost_sign(
     Q_frost_bytes = Q_frost.to_bytes_compressed()  # noqa N806
     Q_frost_point = musig_cpoint(Q_frost_bytes)  # noqa N806
     a_musig = get_session_key_agg_coeff(musig_session_ctx, Q_frost_point)
-    g_musig = 1 if musig_has_even_y(Q_musig) else Scalar(-1)
+    g_musig = Scalar(1) if musig_has_even_y(Q_musig) else Scalar(-1)
     d = g_musig * gacc_musig * d_
     s = k_1 + b_frost * b_musig * k_2 + e_musig * a_musig * a_frost * d
     psig: bytes = s.to_bytes()
@@ -108,11 +107,15 @@ def nested_frost_sign(
 
 
 def nested_frost_partial_sig_agg(
-    psigs: List[bytes], ids: List[int], frost_session_ctx: FrostSessionContext
+    psigs: List[bytes],
+    ids: List[int],
+    frost_session_ctx: FrostSessionContext,
+    musig_session_ctx: MusigSessionContext,
 ) -> bytes:
     if len(psigs) != len(ids):
         raise ValueError("The psigs and ids arrays must have the same length.")
-    (Q, _, tacc, _, R, e) = frost_get_session_values(frost_session_ctx)  # noqa N806
+    (_, _, tacc_frost, _, _, _) = frost_get_session_values(frost_session_ctx)  # noqa N806
+    (Q_musig, _, _, _, _, e_musig) = musig_get_session_values(musig_session_ctx)  # noqa N806
     s = Scalar(0)
     for my_id, psig in zip(ids, psigs):
         s_i = frost_int_from_bytes(psig)
@@ -121,10 +124,10 @@ def nested_frost_partial_sig_agg(
         except ValueError as e:
             raise FrostInvalidContributionError(my_id, "psig") from e
         s = s + s_i
-    g = Scalar(1) if Q.has_even_y() else Scalar(-1)
-    s = s + e * g * tacc
-    sig: bytes = frost_xbytes(R) + s.to_bytes()
-    return sig
+    g_musig = Scalar(1) if musig_has_even_y(Q_musig) else Scalar(-1)
+    s = s + e_musig * g_musig * tacc_frost
+    s_bytes: bytes = s.to_bytes()
+    return s_bytes
 
 
 def demo():
@@ -229,7 +232,7 @@ def demo():
         secnonce_2, frost_ser_secshares[2], 2, frost_session_ctx, musig_session_ctx
     )
     frost_psig = nested_frost_partial_sig_agg(
-        [psig_frost_1, psig_frost_2], [0, 2], frost_session_ctx
+        [psig_frost_1, psig_frost_2], [0, 2], frost_session_ctx, musig_session_ctx
     )
     print("FROST signature generated successfully")
     print(f"FROST signature: {frost_psig.hex()}")
@@ -238,7 +241,7 @@ def demo():
     print("Other MuSig2 signature generated successfully")
     print(f"Other MuSig2 signature: {other_psig.hex()}")
 
-    sig = musig_partial_sig_agg([frost_psig[32:], other_psig], musig_session_ctx)
+    sig = musig_partial_sig_agg([frost_psig, other_psig], musig_session_ctx)
     print("MuSig2 signature generated successfully")
     print(f"MuSig2 signature: {sig.hex()}")
     print("=" * 50)
