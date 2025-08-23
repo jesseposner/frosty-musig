@@ -13,7 +13,7 @@ type-check:
 	mypy .
 
 test:
-	python tests/test_integration.py
+	python3 tests/test_integration.py
 
 check: lint type-check
 
