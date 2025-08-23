@@ -49,7 +49,7 @@ The `docs/` directory contains reference papers:
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone --recursive <repository-url>
 cd frosty-musig
 ```
 
