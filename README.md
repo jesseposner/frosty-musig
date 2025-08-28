@@ -70,7 +70,7 @@ pip install -r requirements-dev.txt
 The project includes a demonstration of the complete nested signing protocol:
 
 ```bash
-python src/nested_signing.py
+python3 src/nested_signing.py
 ```
 
 This will:
@@ -90,7 +90,7 @@ make test
 
 Or manually:
 ```bash
-python tests/test_integration.py
+python3 tests/test_integration.py
 ```
 
 ### Code Quality
